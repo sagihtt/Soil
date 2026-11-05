@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>soil • Catálogo Técnico Automotivo &amp; Cotações</title>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="SOIL" />
+    <meta name="theme-color" content="#0a0b0e" />
+    <meta property="og:image" content="/logo-soil3.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,400..600;1,400&family=Google+Sans+Flex:opsz,slnt,wdth,wght,ROND@8..144,-10..0,25..150,400..700,0..100&family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@20..48,100..700,0..1,-50..200,0..100&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css?v=19" />
+  </head>
+  <body>
+    <!-- Cabeçalho Principal -->
+    <header class="topbar" data-header>
+      <a href="/index" class="brand-group" onclick="navigateTo('/index', event)" aria-label="Início Soil">
+        <img src="/logo-soil.svg" alt="soil" class="brand-logo-img" />
+      </a>
+
+      <nav class="nav-links" aria-label="Navegação Principal">
+        <a
+          href="/index"
+          id="nav-index"
+          class="nav-pill active"
+          onclick="navigateTo('/index', event)"
+        >
+          Consulta &amp; Cotação
+        </a>
+        <a
+          href="/oficina"
+          id="nav-oficina"
+          class="nav-pill"
+          onclick="navigateTo('/oficina', event)"
+          style="display: none;"
+        >
+          Minha Oficina
+        </a>
+        <a
+          href="/admin"
+          id="nav-admin"
+          class="nav-pill"
+          onclick="navigateTo('/admin', event)"
+          style="display: none;"
+        >
+          Administração
+        </a>
+        <a
+          href="/help"
+          id="nav-help"
+          class="nav-pill"
+          onclick="navigateTo('/help', event)"
+        >
+          Como Funciona
+        </a>
+      </nav>
+
+      <div class="topbar-actions">
+        <!-- Botão de Login quando deslogado -->
+        <div id="visitor-actions" style="display: flex; align-items: center; gap: 8px;">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            id="nav-auth"
+            onclick="navigateTo('/auth', event)"
+          >
+            Entrar
+          </button>
+        </div>
+
+        <!-- Identificação e Sair quando logado -->
+        <div id="logged-actions" style="display: none; align-items: center; gap: 8px;">
+          <a
+            href="/oficina"
+            id="tenant-pill-link"
+            class="tenant-pill"
+            onclick="handleRoleWorkspaceClick(event)"
+            title="Acessar painel da sua conta"
+          >
+            <span class="tenant-dot" id="tenant-dot" aria-hidden="true"></span>
+            <span id="tenant-badge">Minha Conta</span>
+          </a>
+          <button
+            type="button"
+            class="btn btn-outline btn-sm"
+            onclick="logoutSession()"
+            title="Encerrar sessão"
+          >
+            Sair
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- VIEW 1: Consulta & Cotação -->
+    <main id="view-index">
+      <div class="hero-stage">
+        <canvas id="agy-particles-canvas" class="particles-canvas" aria-hidden="true"></canvas>
+
+        <section class="search-hero">
+          <div class="hero-brand-lockup">
+            <img src="/logo-soil.svg" alt="soil logo" class="hero-logo-img" />
+            <div class="hero-code-tagline">
+              <span id="typing-spec-preview">Catálogo Homologado • 3 Lubrificantes &amp; 3 Filtros</span>
+              <span class="blinking-cursor" aria-hidden="true"></span>
+            </div>
+          </div>
+
+          <h1>Especificação exata e orçamento em segundos</h1>
+          <p>
+            Selecione o veículo pelos filtros abaixo ou pesquise pelo modelo para consultar os 6 itens obrigatórios de revisão.
+          </p>
+
+          <div class="omnibox-wrapper" id="omnibox-wrapper">
+            <form class="omnibox-bar" onsubmit="handleSearchSubmit(event)">
+              <span class="symbol omnibox-icon" translate="no" aria-hidden="true">search</span>
+              <input
+                type="search"
+                id="search-query"
+                class="omnibox-input"
+                placeholder="Pesquise por marca, modelo ou motorização..."
+                value=""
+                autocomplete="off"
+                aria-label="Pesquisar veículo"
+                onfocus="openOmniboxSuggestions()"
+                oninput="filterOmniboxSuggestions()"
+              />
+              <div class="omnibox-year-group" id="omnibox-year-group">
+                <input type="hidden" id="search-year" value="" />
+                <button
+                  type="button"
+                  id="omnibox-year-trigger"
+                  class="omnibox-year"
+                  onclick="toggleOmniboxYearDropdown(event)"
+                  aria-label="Selecionar ano de fabricação"
+                >
+                  <span id="omnibox-year-label">Ano (opc.)</span>
+                  <span class="symbol omnibox-year-chevron" translate="no" aria-hidden="true">expand_more</span>
+                </button>
+                <div id="omnibox-year-dropdown" class="omnibox-year-dropdown" role="listbox"></div>
+              </div>
+              <button type="submit" class="btn btn-primary" id="btn-search-submit">
+                Consultar
+                <span class="symbol" translate="no" aria-hidden="true">arrow_forward</span>
+              </button>
+            </form>
+
+            <!-- Menu Flutuante de Sugestões da Frota ao clicar no Input -->
+            <div id="omnibox-suggestions" class="omnibox-suggestions" role="listbox"></div>
+          </div>
+
+          <!-- Seletores de Veículo em Cascata -->
+          <div class="vehicle-selectors-panel">
+            <div class="vehicle-selectors-header">
+              <span class="badge-slot">Seleção por Veículo</span>
+              <button
+                type="button"
+                class="btn btn-outline btn-sm"
+                onclick="resetVehicleSelectors()"
+              >
+                Limpar Filtros
+              </button>
+            </div>
+            <div class="vehicle-selectors-grid">
+              <div class="field-group">
+                <label class="field-label" for="filter-category">Categoria</label>
+                <select id="filter-category" class="input-field" onchange="handleCategorySelectorChange()">
+                  <option value="">Todas as Categorias</option>
+                  <option value="CARRO">Automóvel / Passeio</option>
+                  <option value="UTILITARIO">SUV / Utilitário</option>
+                  <option value="MOTO">Motocicleta</option>
+                  <option value="CAMINHAO">Caminhão / Pesado</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="filter-manufacturer">Montadora</label>
+                <select id="filter-manufacturer" class="input-field" onchange="handleManufacturerSelectorChange()">
+                  <option value="">Todas as Montadoras</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="filter-model">Modelo</label>
+                <select id="filter-model" class="input-field" onchange="handleModelSelectorChange()">
+                  <option value="">Todos os Modelos</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="filter-year">Ano do Veículo</label>
+                <select id="filter-year" class="input-field" onchange="handleYearSelectorChange()">
+                  <option value="">Todos os Anos</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="workspace-container">
+        <!-- Etapa de Desambiguação -->
+        <section id="disambiguation-container" class="disambiguation-box" style="display: none;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div>
+              <span class="badge-slot">Escolha da Motorização</span>
+              <h2 id="disambiguation-heading" style="font-size: 1.2rem; font-weight: 450; margin-top: 6px;">
+                Selecione a versão exata do veículo
+              </h2>
+            </div>
+            <span style="font-size: 0.82rem; color: var(--theme-muted);">
+              Clique na versão correspondente ao veículo em atendimento
+            </span>
+          </div>
+          <div id="disambiguation-list" class="disambiguation-grid"></div>
+        </section>
+
+        <!-- Cabeçalho do Veículo Selecionado + Botão da Gaveta de Orçamento -->
+        <section id="selected-vehicle-banner" class="vehicle-banner" style="display: none;">
+          <div>
+            <span class="badge-slot" id="selected-vehicle-years"></span>
+            <h2
+              id="selected-vehicle-title"
+              style="font-size: 1.45rem; font-weight: 450; margin-top: 6px; letter-spacing: -0.02em;"
+            ></h2>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" onclick="clearSelectedVehicle()">
+              Trocar Veículo
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-open-quote-drawer" onclick="openQuoteDrawer()">
+              <span class="symbol" translate="no" aria-hidden="true">receipt_long</span>
+              Abrir Orçamento (3 Opções)
+            </button>
+          </div>
+        </section>
+
+        <!-- Grade dos 6 Itens Técnicos Obrigatórios -->
+        <div id="specs-workspace" style="display: none;">
+          <div class="section-label">
+            <span class="symbol" translate="no" aria-hidden="true">oil_barrel</span>
+            <span>Lubrificantes Obrigatórios • Motor, Freio e Câmbio</span>
+          </div>
+          <div id="grid-lubricants" class="specs-grid"></div>
+
+          <div class="section-label">
+            <span class="symbol" translate="no" aria-hidden="true">filter_alt</span>
+            <span>Filtros Obrigatórios • Óleo, Combustível e Ar</span>
+          </div>
+          <div id="grid-filters" class="specs-grid"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- VIEW 2: Minha Oficina -->
+    <main id="view-oficina" class="workspace-container" style="display: none;">
+      <div class="page-header">
+        <div>
+          <span class="badge-slot">Painel da Oficina</span>
+          <h1>Gestão de Estoque, Clientes e Orçamentos</h1>
+          <p>
+            Cadastre os lubrificantes e filtros trabalhados pela sua empresa, organize sua carteira de clientes e acompanhe os orçamentos enviados.
+          </p>
+        </div>
+        <div class="subnav-pills" role="tablist">
+          <button
+            type="button"
+            class="subnav-btn active"
+            id="oficina-tab-products"
+            onclick="switchOficinaTab('products')"
+          >
+            Estoque &amp; Preços
+          </button>
+          <button
+            type="button"
+            class="subnav-btn"
+            id="oficina-tab-clients"
+            onclick="switchOficinaTab('clients')"
+          >
+            Carteira de Clientes
+          </button>
+          <button
+            type="button"
+            class="subnav-btn"
+            id="oficina-tab-quotes"
+            onclick="switchOficinaTab('quotes')"
+          >
+            Orçamentos Emitidos
+          </button>
+        </div>
+      </div>
+
+      <!-- Indicadores Operacionais da Oficina -->
+      <div id="oficina-kpi-strip" class="kpi-strip" aria-label="Indicadores operacionais da oficina">
+        <div class="kpi-card">
+          <span class="kpi-label">Itens em Estoque</span>
+          <strong class="kpi-value" id="kpi-oficina-products">0</strong>
+          <span class="kpi-meta" id="kpi-oficina-products-meta">Prontos para cotação</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Cobertura dos 6 Slots</span>
+          <strong class="kpi-value" id="kpi-oficina-coverage">0/6</strong>
+          <span class="kpi-meta" id="kpi-oficina-coverage-meta">Subtipos abastecidos</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Carteira de Clientes</span>
+          <strong class="kpi-value" id="kpi-oficina-clients">0</strong>
+          <span class="kpi-meta" id="kpi-oficina-clients-meta">Contatos ativos no CNPJ</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Orçamentos & Volume</span>
+          <strong class="kpi-value" id="kpi-oficina-quotes">0</strong>
+          <span class="kpi-meta" id="kpi-oficina-quotes-meta">R$ 0,00 em propostas</span>
+        </div>
+      </div>
+
+      <!-- Sub-painel 2.1: Estoque & Preços -->
+      <section id="oficina-panel-products" class="panel-grid">
+        <div class="surface-card">
+          <span class="badge-slot" id="prod-form-badge">Novo Item de Estoque</span>
+          <h2 id="prod-form-title" style="font-size: 1.2rem; font-weight: 450; margin: 10px 0 16px;">Adicionar Produto</h2>
+          <form class="form-stack" onsubmit="handleCreateProduct(event)">
+            <div class="field-group">
+              <label class="field-label" for="prod-catalog-select">Aplicação Técnica</label>
+              <select id="prod-catalog-select" class="input-field" required></select>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label" for="prod-manufacturer">Marca / Fabricante</label>
+                <input type="text" id="prod-manufacturer" class="input-field" placeholder="Ex: Motul, Mann-Filter" required />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="prod-sku">Código da Peça (Opc.)</label>
+                <input type="text" id="prod-sku" class="input-field" placeholder="Ex: W 712/95" />
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="prod-name">Descrição Comercial</label>
+              <input type="text" id="prod-name" class="input-field" placeholder="Ex: Óleo 5W-30 Sintético (Frasco 1L)" required />
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label" for="prod-price">Preço Unitário (R$)</label>
+                <input type="number" id="prod-price" class="input-field" step="0.01" min="0.01" placeholder="0,00" required />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="prod-best-quality">Faixa na Cotação</label>
+                <select id="prod-best-quality" class="input-field">
+                  <option value="false">Linha Regular (Concorre por Preço)</option>
+                  <option value="true">Destaque de Melhor Qualidade ★</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" id="prod-form-submit-btn" class="btn btn-primary" style="flex: 1;">Salvar no Estoque</button>
+              <button type="button" id="prod-form-cancel-btn" class="btn btn-outline" style="display: none;" onclick="cancelProductEdit()">Cancelar</button>
+            </div>
+            <div id="prod-feedback"></div>
+          </form>
+        </div>
+
+        <div class="surface-card">
+          <div class="toolbar-header">
+            <div>
+              <span class="badge-slot">Catálogo da Oficina</span>
+              <h2 style="font-size: 1.2rem; font-weight: 450; margin-top: 6px;">Produtos Disponíveis</h2>
+            </div>
+            <div class="toolbar-actions">
+              <button type="button" class="btn btn-outline btn-sm" onclick="exportProductsCsv()" title="Exportar tabela de preços em CSV">
+                Exportar CSV
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="triggerImportProductsCsv()" title="Importar ou atualizar preços via planilha CSV">
+                Importar CSV
+              </button>
+              <input
+                type="file"
+                id="prod-csv-file-input"
+                accept=".csv,text/csv"
+                style="display: none;"
+                onchange="handleImportProductsCsv(event)"
+              />
+              <input
+                type="search"
+                id="prod-filter-input"
+                class="input-field"
+                style="max-width: 240px;"
+                placeholder="Buscar por marca, nome ou código..."
+                oninput="renderProductsList()"
+              />
+            </div>
+          </div>
+          <div id="prod-subtype-pills" class="subtype-filter-bar" role="tablist" aria-label="Filtrar estoque por subtipo">
+            <button type="button" class="subtype-pill active" data-subtype="ALL" onclick="setProductSubtypeFilter('ALL')">Todos</button>
+            <button type="button" class="subtype-pill" data-subtype="MOTOR" onclick="setProductSubtypeFilter('MOTOR')">Óleo Motor</button>
+            <button type="button" class="subtype-pill" data-subtype="FREIO" onclick="setProductSubtypeFilter('FREIO')">Freio</button>
+            <button type="button" class="subtype-pill" data-subtype="CAMBIO" onclick="setProductSubtypeFilter('CAMBIO')">Câmbio</button>
+            <button type="button" class="subtype-pill" data-subtype="OLEO" onclick="setProductSubtypeFilter('OLEO')">Filtro Óleo</button>
+            <button type="button" class="subtype-pill" data-subtype="COMBUSTIVEL" onclick="setProductSubtypeFilter('COMBUSTIVEL')">Filtro Comb.</button>
+            <button type="button" class="subtype-pill" data-subtype="AR" onclick="setProductSubtypeFilter('AR')">Filtro Ar</button>
+          </div>
+          <div id="oficina-products-list" class="data-list"></div>
+        </div>
+      </section>
+
+      <!-- Sub-painel 2.2: Carteira de Clientes -->
+      <section id="oficina-panel-clients" class="panel-grid" style="display: none;">
+        <div class="surface-card">
+          <span class="badge-slot" id="client-form-badge">Novo Cadastro</span>
+          <h2 id="client-form-title" style="font-size: 1.2rem; font-weight: 450; margin: 10px 0 16px;">Adicionar Cliente</h2>
+          <form class="form-stack" onsubmit="handleCreateClientFromPanel(event)">
+            <div class="field-group">
+              <label class="field-label" for="client-name">Nome Completo ou Empresa</label>
+              <input type="text" id="client-name" class="input-field" placeholder="Nome do cliente" required />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="client-phone">Telefone / WhatsApp</label>
+              <input type="text" id="client-phone" class="input-field" placeholder="(11) 98888-7777" maxlength="15" oninput="maskPhoneInput(this)" required />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="client-email">E-mail para Receber Orçamentos</label>
+              <input type="email" id="client-email" class="input-field" placeholder="cliente@email.com.br" required />
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" id="client-form-submit-btn" class="btn btn-primary" style="flex: 1;">Salvar Cliente</button>
+              <button type="button" id="client-form-cancel-btn" class="btn btn-outline" style="display: none;" onclick="cancelClientEdit()">Cancelar</button>
+            </div>
+            <div id="client-panel-feedback"></div>
+          </form>
+        </div>
+
+        <div class="surface-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+            <div>
+              <span class="badge-slot">Clientes da Oficina</span>
+              <h2 style="font-size: 1.2rem; font-weight: 450; margin: 6px 0 0;">Carteira Cadastrada</h2>
+            </div>
+            <input
+              type="search"
+              id="client-filter-input"
+              class="input-field"
+              style="max-width: 240px;"
+              placeholder="Buscar nome, e-mail ou telefone..."
+              oninput="renderClientsList()"
+            />
+          </div>
+          <p style="font-size: 0.82rem; color: var(--theme-muted); margin-bottom: 14px;">
+            Clique em um cliente para pré-selecioná-lo no próximo orçamento ou use <strong>Editar</strong> para atualizar seus dados.
+          </p>
+          <div id="oficina-clients-list" class="data-list"></div>
+        </div>
+      </section>
+
+      <!-- Sub-painel 2.3: Histórico de Orçamentos -->
+      <section id="oficina-panel-quotes" style="display: none;">
+        <div class="surface-card">
+          <div class="toolbar-header">
+            <div>
+              <span class="badge-slot">Histórico de Atendimento</span>
+              <h2 style="font-size: 1.2rem; font-weight: 450; margin-top: 6px;">Orçamentos Salvos e Enviados</h2>
+              <p style="font-size: 0.82rem; color: var(--theme-muted); margin-top: 2px;">
+                Clique em qualquer orçamento da lista para reabri-lo na gaveta lateral e revisar seus itens.
+              </p>
+            </div>
+            <div class="toolbar-actions">
+              <input
+                type="search"
+                id="quote-filter-input"
+                class="input-field"
+                style="max-width: 240px;"
+                placeholder="Filtrar veículo ou cliente..."
+                oninput="renderQuotesList()"
+              />
+              <select
+                id="quote-status-filter"
+                class="input-field"
+                style="max-width: 195px;"
+                onchange="renderQuotesList()"
+              >
+                <option value="ALL">Todos os Status</option>
+                <option value="DRAFT">Salvos no Balcão</option>
+                <option value="SENT">Enviados por E-mail</option>
+              </select>
+              <button type="button" class="btn btn-outline btn-sm" onclick="navigateTo('/index', event)">
+                + Nova Consulta de Veículo
+              </button>
+            </div>
+          </div>
+          <div id="oficina-quotes-feedback" style="margin-bottom: 12px;"></div>
+          <div id="oficina-quotes-list" class="data-list"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- VIEW 3: Administração -->
+    <main id="view-admin" class="workspace-container" style="display: none;">
+      <div class="page-header">
+        <div>
+          <span class="badge-slot">Painel Administrativo</span>
+          <h1>Curadoria de Contas e Catálogo Automotivo</h1>
+          <p>
+            Aprove solicitações de acesso de oficinas, cadastre novas motorizações na frota e mantenha as especificações dos 6 itens obrigatórios.
+          </p>
+        </div>
+        <div class="subnav-pills" role="tablist">
+          <button
+            type="button"
+            class="subnav-btn active"
+            id="admin-tab-users"
+            onclick="switchAdminTab('users')"
+          >
+            Aprovação de Contas
+          </button>
+          <button
+            type="button"
+            class="subnav-btn"
+            id="admin-tab-vehicles"
+            onclick="switchAdminTab('vehicles')"
+          >
+            Frota de Veículos
+          </button>
+          <button
+            type="button"
+            class="subnav-btn"
+            id="admin-tab-catalogs"
+            onclick="switchAdminTab('catalogs')"
+          >
+            Catálogo Técnico
+          </button>
+        </div>
+      </div>
+
+      <!-- Indicadores Globais da Plataforma (Admin) -->
+      <div id="admin-kpi-strip" class="kpi-strip" aria-label="Indicadores globais da plataforma">
+        <div class="kpi-card">
+          <span class="kpi-label">Montadoras Ativas</span>
+          <strong class="kpi-value" id="kpi-admin-brands">0</strong>
+          <span class="kpi-meta" id="kpi-admin-brands-meta">Frota nacional homologada</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Veículos e Motorizações</span>
+          <strong class="kpi-value" id="kpi-admin-vehicles">0</strong>
+          <span class="kpi-meta" id="kpi-admin-vehicles-meta">6 slots técnicos por veículo</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Normas Canônicas</span>
+          <strong class="kpi-value" id="kpi-admin-catalogs">0</strong>
+          <span class="kpi-meta" id="kpi-admin-catalogs-meta">Fluidodinâmica e filtragem</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Fila de Curadoria</span>
+          <strong class="kpi-value" id="kpi-admin-pending">0</strong>
+          <span class="kpi-meta" id="kpi-admin-pending-meta">Contas aguardando revisão</span>
+        </div>
+      </div>
+
+      <!-- Aviso exibido se o usuário logado não for Administrador -->
+      <div id="admin-role-guard" class="surface-card" style="display: none; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+          <div>
+            <span class="badge-slot">Credencial Administrativa Necessária</span>
+            <h3 style="font-size: 1.15rem; font-weight: 450; margin-top: 6px;">
+              Esta área é restrita à equipe de curadoria e engenharia da SOIL
+            </h3>
+            <p style="color: var(--theme-on-surface-variant); font-size: 0.86rem; margin-top: 4px;">
+              Autentique-se com uma credencial de Administrador para aprovar cadastros de oficinas ou atualizar a base nacional de veículos.
+            </p>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="navigateTo('/auth', event)">
+            Autenticar como Administrador →
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-painel 3.1: Aprovação de Contas -->
+      <section id="admin-panel-users">
+        <div class="surface-card">
+          <div class="toolbar-header">
+            <div>
+              <span class="badge-slot">Curadoria de Acesso</span>
+              <h2 style="font-size: 1.2rem; font-weight: 450; margin-top: 6px;">Gestão de Contas de Operadores e Oficinas</h2>
+            </div>
+            <div class="toolbar-actions">
+              <input
+                type="search"
+                id="admin-user-search-input"
+                class="input-field"
+                style="max-width: 240px;"
+                placeholder="Buscar nome, login ou CNPJ..."
+                oninput="renderAdminUsersList()"
+              />
+              <select
+                id="admin-user-status-filter"
+                class="input-field"
+                style="max-width: 195px;"
+                onchange="loadAdminPendingUsers()"
+              >
+                <option value="ALL">Todas as Contas</option>
+                <option value="PENDING">Aguardando Aprovação</option>
+                <option value="APPROVED">Contas Aprovadas</option>
+                <option value="REJECTED">Contas Recusadas</option>
+              </select>
+              <button type="button" class="btn btn-outline btn-sm" onclick="loadAdminPendingUsers()">
+                Atualizar Lista
+              </button>
+            </div>
+          </div>
+          <div id="admin-users-feedback" style="margin-bottom: 12px;"></div>
+          <div id="admin-users-list" class="data-list"></div>
+        </div>
+      </section>
+
+      <!-- Sub-painel 3.2: Frota de Veículos -->
+      <section id="admin-panel-vehicles" class="panel-grid" style="display: none;">
+        <div class="surface-card">
+          <span class="badge-slot" id="veh-form-badge">Novo Veículo</span>
+          <h2 id="veh-form-title" style="font-size: 1.2rem; font-weight: 450; margin: 10px 0 16px;">Cadastrar Modelo e Motorização</h2>
+          <form class="form-stack" onsubmit="handleCreateVehicle(event)">
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label" for="veh-manufacturer">Montadora</label>
+                <input type="text" id="veh-manufacturer" class="input-field" placeholder="Ex: Volkswagen" required />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="veh-model">Modelo</label>
+                <input type="text" id="veh-model" class="input-field" placeholder="Ex: Polo" required />
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="veh-version">Versão / Motorização</label>
+              <input type="text" id="veh-version" class="input-field" placeholder="Ex: 1.0 200 TSI Total Flex" required />
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label" for="veh-type">Categoria</label>
+                <select id="veh-type" class="input-field">
+                  <option value="CARRO">Automóvel / Passeio</option>
+                  <option value="UTILITARIO">SUV / Utilitário</option>
+                  <option value="MOTO">Motocicleta</option>
+                  <option value="CAMINHAO">Caminhão / Pesado</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="veh-year-start">Período (De / Até)</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <input type="number" id="veh-year-start" class="input-field" min="1900" max="2100" placeholder="De" required />
+                  <input type="number" id="veh-year-end" class="input-field" min="1900" max="2100" placeholder="Até" required />
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" id="veh-form-submit-btn" class="btn btn-primary" style="flex: 1;">Cadastrar Veículo</button>
+              <button type="button" id="veh-form-cancel-btn" class="btn btn-outline" style="display: none;" onclick="cancelVehicleEdit()">Cancelar</button>
+            </div>
+            <div id="veh-feedback"></div>
+          </form>
+        </div>
+
+        <div class="surface-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+            <div>
+              <span class="badge-slot">Base Nacional</span>
+              <h2 style="font-size: 1.2rem; font-weight: 450; margin-top: 6px;">Frota Cadastrada</h2>
+            </div>
+            <input
+              type="search"
+              id="admin-vehicle-filter-input"
+              class="input-field"
+              style="max-width: 260px;"
+              placeholder="Filtrar marca, modelo ou ano..."
+              oninput="renderAdminVehiclesList()"
+            />
+          </div>
+          <p style="font-size: 0.82rem; color: var(--theme-muted); margin-bottom: 14px;">
+            Clique em um veículo para consultar seus 6 itens ou use <strong>Editar</strong> para ajustar versão e anos.
+          </p>
+          <div id="admin-vehicles-list" class="data-list"></div>
+        </div>
+      </section>
+
+      <!-- Sub-painel 3.3: Especificações Técnicas e Vínculos -->
+      <section id="admin-panel-catalogs" class="panel-grid" style="display: none;">
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <div class="surface-card">
+            <span class="badge-slot" id="cat-form-badge">Nova Norma ou Elemento</span>
+            <h2 id="cat-form-title" style="font-size: 1.15rem; font-weight: 450; margin: 10px 0 14px;">Criar Especificação Técnica</h2>
+            <form class="form-stack" onsubmit="handleCreateCatalog(event)">
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="cat-category">Grupo</label>
+                  <select id="cat-category" class="input-field" onchange="syncCatalogSubtypes()">
+                    <option value="OLEO">Lubrificante / Fluido</option>
+                    <option value="FILTRO">Elemento Filtrante</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="cat-subtype">Aplicação</label>
+                  <select id="cat-subtype" class="input-field"></select>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="cat-name">Nome da Especificação</label>
+                <input type="text" id="cat-name" class="input-field" placeholder="Ex: Óleo Sintético 0W-20 VW 508.00" required />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="cat-spec">Norma da Montadora / Referência</label>
+                <input type="text" id="cat-spec" class="input-field" placeholder="Ex: SAE 0W-20 ACEA C5 / VW 508.00" required />
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="submit" id="cat-form-submit-btn" class="btn btn-primary" style="flex: 1;">Adicionar ao Catálogo</button>
+                <button type="button" id="cat-form-cancel-btn" class="btn btn-outline" style="display: none;" onclick="cancelCatalogEdit()">Cancelar</button>
+              </div>
+              <div id="cat-feedback"></div>
+            </form>
+          </div>
+
+          <div class="surface-card">
+            <span class="badge-slot">Aplicação por Motorização</span>
+            <h2 style="font-size: 1.15rem; font-weight: 450; margin: 10px 0 14px;">Vincular Item a um Veículo</h2>
+            <form class="form-stack" onsubmit="handleAssignTechSpec(event)">
+              <div class="field-group">
+                <label class="field-label" for="spec-vehicle-select">Veículo</label>
+                <select id="spec-vehicle-select" class="input-field" onchange="preloadCurrentTechSpecSlot()" required></select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="spec-catalog-select">Especificação Técnica</label>
+                <select id="spec-catalog-select" class="input-field" onchange="preloadCurrentTechSpecSlot()" required></select>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="spec-liters">Volume (L) ou Qtd</label>
+                  <input type="number" id="spec-liters" class="input-field" step="0.1" min="0.1" placeholder="Ex: 4.3" required />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="spec-interval">Intervalo (KM)</label>
+                  <input type="number" id="spec-interval" class="input-field" step="1000" min="1000" placeholder="Ex: 10000" />
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="spec-notes">Observações Mecânicas</label>
+                <input type="text" id="spec-notes" class="input-field" placeholder="Ex: Capacidade com troca de filtro" />
+              </div>
+              <button type="submit" class="btn btn-outline" style="width: 100%;">Salvar Vínculo Técnico</button>
+              <div id="spec-assign-feedback"></div>
+            </form>
+          </div>
+        </div>
+
+        <div class="surface-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+            <div>
+              <span class="badge-slot">Itens Homologados</span>
+              <h2 style="font-size: 1.2rem; font-weight: 450; margin-top: 6px;">Catálogo Técnico Base</h2>
+            </div>
+            <input
+              type="search"
+              id="admin-catalog-filter-input"
+              class="input-field"
+              style="max-width: 240px;"
+              placeholder="Filtrar viscosidade ou norma..."
+              oninput="renderAdminCatalogsList()"
+            />
+          </div>
+          <p style="font-size: 0.82rem; color: var(--theme-muted); margin-bottom: 14px;">
+            Clique em uma especificação para selecioná-la no formulário de vínculo ao lado.
+          </p>
+          <div id="admin-catalogs-list" class="data-list"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Marcador de rota /principal redirecionado para a aba de Credenciamento em #view-auth -->
+    <div id="view-principal" style="display: none;"></div>
+
+    <!-- VIEW 5: Portal Corporativo de Acesso e Credenciamento B2B -->
+    <main id="view-auth" class="workspace-container" style="display: none; padding-top: 38px;">
+      <div class="auth-portal-header">
+        <span class="badge-slot">Portal Corporativo B2B</span>
+        <h1>Acesso e Credenciamento de Oficinas</h1>
+        <p>
+          Entre com sua credencial de operador ou cadastre o CNPJ do seu centro automotivo para operar na plataforma.
+        </p>
+        <div class="subnav-pills" role="tablist" aria-label="Acesso ou Credenciamento">
+          <button
+            type="button"
+            class="subnav-btn active"
+            id="auth-tab-login"
+            onclick="switchAuthTab('login')"
+          >
+            Entrar na Conta
+          </button>
+          <button
+            type="button"
+            class="subnav-btn"
+            id="auth-tab-register"
+            onclick="switchAuthTab('register')"
+          >
+            Credenciar Oficina (CNPJ)
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA 1: LOGIN E SESSÃO ATIVA -->
+      <section id="auth-panel-login" class="auth-single-container">
+        <!-- Card exibido quando deslogado -->
+        <div class="surface-card" id="auth-login-card">
+          <span class="badge-slot">Identificação do Operador</span>
+          <h2 style="font-size: 1.5rem; font-weight: 450; margin: 10px 0 8px;">Entrar na plataforma</h2>
+          <p style="color: var(--theme-on-surface-variant); font-size: 0.88rem; margin-bottom: 22px;">
+            Informe seu usuário ou e-mail profissional. O sistema direciona automaticamente para <strong>Minha Oficina</strong> ou <strong>Administração</strong> conforme sua credencial.
+          </p>
+          <form class="form-stack" onsubmit="handleLoginSubmit(event)">
+            <div class="field-group">
+              <label class="field-label" for="login-identifier">Usuário ou E-mail Corporativo</label>
+              <input
+                type="text"
+                id="login-identifier"
+                class="input-field"
+                placeholder="Digite seu usuário ou e-mail"
+                autocomplete="username"
+                required
+              />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="login-password">Senha de Acesso</label>
+              <div class="password-input-wrapper">
+                <input
+                  type="password"
+                  id="login-password"
+                  class="input-field"
+                  placeholder="Digite sua senha"
+                  autocomplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="password-toggle-btn"
+                  onclick="togglePasswordVisibility('login-password', this)"
+                  aria-label="Mostrar ou ocultar senha"
+                  title="Mostrar ou ocultar senha"
+                >
+                  <span class="symbol" translate="no" aria-hidden="true">visibility</span>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 4px;">
+              Acessar Plataforma
+              <span class="symbol" translate="no" aria-hidden="true">arrow_forward</span>
+            </button>
+            <div id="login-feedback"></div>
+          </form>
+
+          <div class="auth-card-footer">
+            <span>Sua oficina ou autopeças ainda não possui cadastro?</span>
+            <button type="button" class="btn btn-outline btn-sm" onclick="switchAuthTab('register')">
+              Credenciar Oficina (CNPJ) →
+            </button>
+          </div>
+        </div>
+
+        <!-- Card exibido quando já autenticado -->
+        <div class="surface-card" id="auth-logged-card" style="display: none;">
+          <span class="badge-slot">Sessão Corporativa Ativa</span>
+          <h2 style="font-size: 1.4rem; font-weight: 450; margin: 10px 0 14px;">Credencial Conectada</h2>
+          <div id="auth-session-details" class="data-list"></div>
+        </div>
+      </section>
+
+      <!-- ABA 2: CREDENCIAMENTO DE OFICINA (CNPJ) E OPERADOR -->
+      <section id="auth-panel-register" style="display: none;">
+        <div class="split-layout" id="onboarding-forms-column">
+          <!-- Passo 1: Cadastrar Empresa -->
+          <div class="surface-card">
+            <span class="badge-slot">Etapa 1 de 2 • Pessoa Jurídica</span>
+            <h2 style="font-size: 1.3rem; font-weight: 450; margin: 10px 0 6px;">Credenciar Oficina ou Centro Automotivo</h2>
+            <p style="color: var(--theme-on-surface-variant); font-size: 0.86rem; margin-bottom: 18px;">
+              Cadastre o CNPJ válido do seu estabelecimento para habilitar gestão de estoque próprio, precificação e emissão de orçamentos.
+            </p>
+            <form class="form-stack" onsubmit="handleRegisterCompany(event)">
+              <div class="field-group">
+                <label class="field-label" for="reg-cnpj">CNPJ do Estabelecimento</label>
+                <input
+                  type="text"
+                  id="reg-cnpj"
+                  class="input-field"
+                  placeholder="00.000.000/0001-00"
+                  maxlength="18"
+                  oninput="maskCnpjInput(this)"
+                  required
+                />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="reg-tradename">Nome Fantasia da Oficina</label>
+                <input
+                  type="text"
+                  id="reg-tradename"
+                  class="input-field"
+                  placeholder="Ex: Auto Center Paulista"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Validar e Credenciar CNPJ
+                <span class="symbol" translate="no" aria-hidden="true">verified</span>
+              </button>
+              <div id="reg-company-feedback"></div>
+            </form>
+
+            <div class="data-list" style="margin-top: 22px;">
+              <div class="data-row">
+                <div>
+                  <strong>Isolamento Comercial por CNPJ</strong>
+                  <div class="data-row-meta">Tabela de preços, estoque de peças e carteira de clientes exclusivos da sua empresa</div>
+                </div>
+                <span class="symbol" translate="no" aria-hidden="true">shield_lock</span>
+              </div>
+              <div class="data-row">
+                <div>
+                  <strong>Múltiplos Consultores e Mecânicos</strong>
+                  <div class="data-row-meta">Vincule toda a equipe de balcão e box sob o mesmo CNPJ credenciado</div>
+                </div>
+                <span class="symbol" translate="no" aria-hidden="true">group</span>
+              </div>
+              <div class="data-row">
+                <div>
+                  <strong>Cotação em 3 Faixas por E-mail</strong>
+                  <div class="data-row-meta">Cálculo automático das opções Mais Barato, Melhor Qualidade e Mais Caro</div>
+                </div>
+                <span class="symbol" translate="no" aria-hidden="true">receipt_long</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Passo 2: Cadastrar Operador -->
+          <div class="surface-card">
+            <span class="badge-slot">Etapa 2 de 2 • Credencial da Equipe</span>
+            <h2 style="font-size: 1.3rem; font-weight: 450; margin: 10px 0 6px;">Criar Conta de Consultor / Mecânico</h2>
+            <p style="color: var(--theme-on-surface-variant); font-size: 0.86rem; margin-bottom: 18px;">
+              Vincule seu usuário ao CNPJ da oficina. Assim que a credencial for aprovada pela curadoria, seu acesso é liberado em <strong>Minha Oficina</strong>.
+            </p>
+            <form class="form-stack" onsubmit="handleSignupUser(event)">
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="signup-cnpj">CNPJ da Oficina</label>
+                  <input
+                    type="text"
+                    id="signup-cnpj"
+                    class="input-field"
+                    placeholder="00.000.000/0001-00"
+                    maxlength="18"
+                    oninput="maskCnpjInput(this)"
+                    required
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="signup-name">Nome Completo</label>
+                  <input
+                    type="text"
+                    id="signup-name"
+                    class="input-field"
+                    placeholder="Nome e sobrenome"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="signup-login">Usuário de Acesso</label>
+                  <input
+                    type="text"
+                    id="signup-login"
+                    class="input-field"
+                    placeholder="Ex: joao.oficina"
+                    autocomplete="username"
+                    required
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="signup-phone">Telefone / WhatsApp</label>
+                  <input
+                    type="text"
+                    id="signup-phone"
+                    class="input-field"
+                    placeholder="(11) 99999-0000"
+                    maxlength="15"
+                    oninput="maskPhoneInput(this)"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="signup-email">E-mail Corporativo</label>
+                  <input
+                    type="email"
+                    id="signup-email"
+                    class="input-field"
+                    placeholder="voce@oficina.com.br"
+                    autocomplete="email"
+                    required
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="signup-password">Senha de Acesso</label>
+                  <input
+                    type="password"
+                    id="signup-password"
+                    class="input-field"
+                    placeholder="Mínimo 8 caracteres"
+                    autocomplete="new-password"
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-outline" style="width: 100%; margin-top: 4px;">
+                Solicitar Credencial de Operador
+                <span class="symbol" translate="no" aria-hidden="true">person_add</span>
+              </button>
+              <div id="signup-user-feedback"></div>
+            </form>
+
+            <div class="auth-card-footer">
+              <span>Já possui usuário aprovado?</span>
+              <button type="button" class="btn btn-outline btn-sm" onclick="switchAuthTab('login')">
+                Voltar para Login →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- VIEW 6: Como Funciona -->
+    <main id="view-help" class="workspace-container" style="display: none;">
+      <div class="page-header">
+        <div>
+          <span class="badge-slot">Arquitetura &amp; Metodologia B2B</span>
+          <h1>Como a SOIL padroniza especificações e acelera vendas no balcão</h1>
+          <p>
+            Conectamos dados de engenharia OEM ao estoque real do seu centro automotivo para eliminar erros de aplicação e gerar propostas comerciais em segundos.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline" onclick="navigateTo('/principal', event)">
+            Credenciar Minha Oficina (CNPJ)
+          </button>
+          <button type="button" class="btn btn-primary" onclick="openFeatureFromLanding('search')">
+            Consultar Veículo Agora
+            <span class="symbol" translate="no" aria-hidden="true">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="split-layout">
+        <div class="surface-card">
+          <span class="badge-slot">Fluxo Operacional no Balcão</span>
+          <h2 style="font-size: 1.3rem; font-weight: 450; margin: 10px 0 8px;">Da identificação do motor ao envio do orçamento</h2>
+          <p style="color: var(--theme-on-surface-variant); font-size: 0.86rem; margin-bottom: 18px;">
+            Cada etapa foi desenhada para que o consultor técnico ou mecânico atenda o cliente sem depender de tabelas impressas ou catálogos dispersos.
+          </p>
+          <div class="data-list">
+            <div class="data-row clickable" onclick="openFeatureFromLanding('search')">
+              <div>
+                <strong>1. Desambiguação Exata de Motorização</strong>
+                <p style="color: var(--theme-on-surface-variant); font-size: 0.84rem; margin-top: 4px;">
+                  Selecione categoria, montadora, modelo e ano ou pesquise diretamente na barra superior. Quando um modelo possui múltiplas motorizações (ex.: aspirado, turbo flex, turbodiesel ou correia banhada a óleo), o sistema exige a confirmação da versão exata.
+                </p>
+              </div>
+              <span class="symbol" translate="no" aria-hidden="true">search</span>
+            </div>
+            <div class="data-row clickable" onclick="openFeatureFromLanding('specs')">
+              <div>
+                <strong>2. Matriz dos 6 Itens Obrigatórios de Revisão</strong>
+                <p style="color: var(--theme-on-surface-variant); font-size: 0.84rem; margin-top: 4px;">
+                  A consulta apresenta simultaneamente os <strong>3 Lubrificantes</strong> (Óleo de Motor, Fluido de Freio e Fluido de Transmissão) com capacidade exata em litros e os <strong>3 Filtros</strong> (Óleo, Combustível e Ar do Motor), já cruzados com as marcas do seu estoque.
+                </p>
+              </div>
+              <span class="symbol" translate="no" aria-hidden="true">oil_barrel</span>
+            </div>
+            <div class="data-row clickable" onclick="openFeatureFromLanding('quote')">
+              <div>
+                <strong>3. Cotação Inteligente em 3 Faixas por E-mail</strong>
+                <p style="color: var(--theme-on-surface-variant); font-size: 0.84rem; margin-top: 4px;">
+                  Com base nos preços da sua oficina, o motor de cálculo monta três cenários prontos (<strong>Mais Barato</strong>, <strong>Melhor Qualidade ★</strong> e <strong>Mais Caro</strong>). Basta revisar quantidades, vincular o cliente e disparar a proposta por e-mail.
+                </p>
+              </div>
+              <span class="symbol" translate="no" aria-hidden="true">send</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <div class="surface-card">
+            <span class="badge-slot">Governança &amp; Isolamento Multi-Empresa</span>
+            <h2 style="font-size: 1.3rem; font-weight: 450; margin: 10px 0 8px;">Operação estruturada por CNPJ</h2>
+            <p style="color: var(--theme-on-surface-variant); font-size: 0.86rem; margin-bottom: 16px;">
+              A SOIL opera em arquitetura B2B multi-tenant: a base de engenharia automotiva é nacional e padronizada, enquanto os dados comerciais pertencem exclusivamente a cada oficina.
+            </p>
+            <div class="data-list">
+              <div class="data-row">
+                <div>
+                  <strong>Tabela de Preços e Estoque Privados</strong>
+                  <div class="data-row-meta">Nenhuma outra oficina visualiza os custos, SKUs ou margens praticadas pelo seu CNPJ</div>
+                </div>
+                <span class="symbol" translate="no" aria-hidden="true">lock</span>
+              </div>
+              <div class="data-row">
+                <div>
+                  <strong>Homologação Técnica Centralizada</strong>
+                  <div class="data-row-meta">Normas API SP, ACEA, ILSAC, Dexos, VW e FCA auditadas continuamente pela engenharia SOIL</div>
+                </div>
+                <span class="symbol" translate="no" aria-hidden="true">verified</span>
+              </div>
+              <div class="data-row">
+                <div>
+                  <strong>Carteira de Clientes &amp; Histórico</strong>
+                  <div class="data-row-meta">Registro de propostas salvas no balcão ou enviadas por e-mail para recorrência de revisão</div>
+                </div>
+                <span class="symbol" translate="no" aria-hidden="true">history</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="surface-card">
+            <span class="badge-slot">Acesso Direto</span>
+            <h2 style="font-size: 1.2rem; font-weight: 450; margin: 10px 0 14px;">Áreas da Plataforma</h2>
+            <div class="data-list">
+              <div class="data-row clickable" onclick="openFeatureFromLanding('search')">
+                <div>
+                  <strong>Consulta Técnica &amp; Cotação</strong>
+                  <div class="data-row-meta">Pesquisa de veículos, 6 especificações obrigatórias e simulador de orçamento</div>
+                </div>
+                <span class="btn btn-outline btn-sm">Acessar</span>
+              </div>
+              <div class="data-row clickable" onclick="navigateTo('/principal', event)">
+                <div>
+                  <strong>Credenciamento de Oficinas (CNPJ)</strong>
+                  <div class="data-row-meta">Habilitação de novos centros automotivos e criação de credenciais de equipe</div>
+                </div>
+                <span class="btn btn-outline btn-sm">Credenciar</span>
+              </div>
+              <div class="data-row clickable" onclick="navigateTo('/auth', event)">
+                <div>
+                  <strong>Acesso do Operador</strong>
+                  <div class="data-row-meta">Login corporativo com redirecionamento automático para Minha Oficina ou Administração</div>
+                </div>
+                <span class="btn btn-outline btn-sm">Entrar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Rodapé Corporativo B2B -->
+    <footer class="agy-footer">
+      <div class="agy-footer-grid">
+        <div class="agy-footer-brand">
+          <a href="/index" class="brand-group" onclick="navigateTo('/index', event)" aria-label="Início Soil">
+            <img src="/logo-soil.svg" alt="soil" class="brand-logo-img" style="height: 30px;" />
+          </a>
+          <p>
+            <strong>SOIL Tecnologia e Dados Automotivos Ltda.</strong><br />
+            Infraestrutura B2B de especificações técnicas de lubrificantes, fluidos e filtros com motor de cotação multicritério para centros automotivos, concessionárias e oficinas mecânicas.
+          </p>
+          <div class="agy-footer-status">
+            <span class="tenant-dot" aria-hidden="true"></span>
+            <span>Base Técnica 2026 • Operação B2B Ativa</span>
+          </div>
+        </div>
+
+        <div class="agy-footer-col">
+          <h4>Plataforma</h4>
+          <ul class="agy-footer-links">
+            <li><a href="/index" onclick="navigateTo('/index', event)">Consulta por Veículo e Motor</a></li>
+            <li><a href="/oficina" onclick="navigateTo('/oficina', event)">Gestão de Estoque e Margem</a></li>
+            <li><a href="/principal" onclick="navigateTo('/principal', event)">Credenciamento de Oficinas</a></li>
+            <li><a href="/auth" onclick="navigateTo('/auth', event)">Acesso do Operador</a></li>
+            <li><a href="/help" onclick="navigateTo('/help', event)">Como Funciona</a></li>
+          </ul>
+        </div>
+
+        <div class="agy-footer-col">
+          <h4>Engenharia &amp; Normas</h4>
+          <ul class="agy-footer-links">
+            <li><span>Homologações OEM por Montadora</span></li>
+            <li><span>Lubrificantes API SP / ACEA / ILSAC</span></li>
+            <li><span>Fluidos de Transmissão e Freio</span></li>
+            <li><span>Cruzamento de Filtros Linha Leve e Pesada</span></li>
+          </ul>
+        </div>
+
+        <div class="agy-footer-col">
+          <h4>Atendimento Corporativo</h4>
+          <ul class="agy-footer-links">
+            <li><span>Comercial B2B: comercial@soil.com.br</span></li>
+            <li><span>Suporte Técnico: suporte@soil.com.br</span></li>
+            <li><span>Central: (11) 3180-4490</span></li>
+            <li><span>Seg. a Sex. • 08h às 18h (Horário de Brasília)</span></li>
+            <li><span>Av. Paulista, 1636 • São Paulo, SP</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="agy-footer-bottom">
+        <div>
+          © 2026 SOIL Tecnologia e Dados Automotivos Ltda. • CNPJ 48.921.304/0001-72 • Todos os direitos reservados.
+        </div>
+        <div class="agy-footer-bottom-links">
+          <a href="/help" onclick="navigateTo('/help', event)">Conformidade LGPD</a>
+          <a href="/principal" onclick="navigateTo('/principal', event)">Licenciamento para Redes e Oficinas</a>
+          <a href="/help" onclick="navigateTo('/help', event)">SLA 99,9%</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- GAVETA LATERAL DE ORÇAMENTO -->
+    <div id="drawer-backdrop" class="drawer-backdrop" onclick="closeQuoteDrawer()"></div>
+    <aside id="quote-drawer" class="quote-drawer" aria-label="Gaveta de Orçamento">
+      <div class="drawer-header">
+        <div>
+          <span class="badge-slot">Proposta de Revisão</span>
+          <h3 id="drawer-vehicle-name" style="font-size: 1.12rem; font-weight: 450; margin-top: 4px;">Orçamento</h3>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeQuoteDrawer()">
+          Fechar ✕
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <div>
+          <label class="field-label" style="display: block; margin-bottom: 8px;">
+            1 • Escolha a Faixa da Proposta
+          </label>
+          <div class="tier-tabs">
+            <button type="button" class="tier-tab" id="tab-cheapest" onclick="selectQuoteTier('cheapest')">
+              <div>Mais Barato</div>
+              <small id="price-cheapest">R$ 0,00</small>
+            </button>
+            <button type="button" class="tier-tab active" id="tab-bestQuality" onclick="selectQuoteTier('bestQuality')">
+              <div>Melhor Qualidade ★</div>
+              <small id="price-bestQuality">R$ 0,00</small>
+            </button>
+            <button type="button" class="tier-tab" id="tab-mostExpensive" onclick="selectQuoteTier('mostExpensive')">
+              <div>Mais Caro</div>
+              <small id="price-mostExpensive">R$ 0,00</small>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+            <label class="field-label" style="margin: 0;">
+              2 • Itens e Quantidades (Editáveis)
+            </label>
+            <button
+              type="button"
+              id="btn-toggle-bottle-rounding"
+              class="btn btn-outline btn-sm"
+              onclick="toggleQuoteOilBottleRounding()"
+              title="Alternar entre fechar em frascos inteiros de 1L (com indicação de sobra técnica) ou cobrar litragem fracionada exata"
+            >
+              Fechar Frascos 1L
+            </button>
+          </div>
+          <div id="drawer-items-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+
+        <div style="border-top: 1px solid var(--theme-outline); padding-top: 16px;">
+          <label class="field-label" style="display: block; margin-bottom: 8px;">
+            3 • Cliente Destinatário
+          </label>
+          <select id="drawer-client-select" class="input-field" style="margin-bottom: 10px;"></select>
+
+          <details style="font-size: 0.82rem;">
+            <summary style="cursor: pointer; font-weight: 500; color: var(--theme-on-surface);">
+              + Cadastrar novo cliente rapidamente
+            </summary>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+              <input type="text" id="new-client-name" class="input-field" placeholder="Nome do Cliente" />
+              <input type="text" id="new-client-phone" class="input-field" placeholder="Telefone com DDD" />
+              <input type="email" id="new-client-email" class="input-field" placeholder="E-mail do Cliente" />
+              <button type="button" class="btn btn-outline btn-sm" onclick="createQuickClient()">Salvar Cliente</button>
+            </div>
+          </details>
+        </div>
+
+        <div id="drawer-feedback"></div>
+      </div>
+
+      <div class="drawer-footer">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <span style="font-size: 0.88rem; color: var(--theme-on-surface-variant);">Valor Total</span>
+          <strong id="drawer-total-amount" style="font-family: 'Google Sans Code', monospace; font-size: 1.4rem;">
+            R$ 0,00
+          </strong>
+        </div>
+        <div class="drawer-action-grid">
+          <button
+            type="button"
+            class="btn btn-outline btn-sm"
+            style="width: 100%; justify-content: center;"
+            id="btn-print-quote"
+            onclick="printCurrentQuote()"
+          >
+            <span class="symbol" translate="no" aria-hidden="true" style="font-size: 16px;">print</span>
+            PDF
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline btn-sm"
+            style="width: 100%; justify-content: center;"
+            id="btn-copy-quote"
+            onclick="copyCurrentQuoteSummary()"
+          >
+            <span class="symbol" translate="no" aria-hidden="true" style="font-size: 16px;">content_copy</span>
+            Copiar
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline btn-sm"
+            style="width: 100%; justify-content: center;"
+            id="btn-whatsapp-quote"
+            onclick="sendCurrentQuoteWhatsApp()"
+          >
+            <span class="symbol" translate="no" aria-hidden="true" style="font-size: 16px;">chat</span>
+            WhatsApp
+          </button>
+        </div>
+        <button
+          type="button"
+          class="btn btn-primary"
+          style="width: 100%;"
+          id="btn-send-quote-email"
+          onclick="saveAndSendQuoteEmail()"
+        >
+          <span class="symbol" translate="no" aria-hidden="true">send</span>
+          Salvar e Enviar por E-mail
+        </button>
+      </div>
+    </aside>
+
+    <!-- Viewport Flutuante de Notificações Toast -->
+    <div id="toast-viewport" class="toast-viewport" aria-live="polite"></div>
+
+    <script src="/app.js?v=18"></script>
+  </body>
+</html>

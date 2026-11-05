@@ -1,0 +1,21 @@
+{
+  "name": "soil-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plataforma SaaS B2B para consulta de especificações de lubrificantes/filtros e geração de orçamentos automotivos",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "start": "npm run start --workspace=@soil/api",
+    "dev:demo": "npm run dev:demo --workspace=@soil/api",
+    "test": "npm run test --workspaces --if-present",
+    "test:unit": "npm run test:unit --workspace=@soil/api",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

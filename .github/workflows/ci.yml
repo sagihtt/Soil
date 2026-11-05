@@ -1,0 +1,31 @@
+name: SOIL CI Pipeline (TypeScript Strict + TDD Suite)
+
+on:
+  push:
+    branches: ["main", "master", "develop"]
+  pull_request:
+    branches: ["main", "master", "develop"]
+
+jobs:
+  verify:
+    name: Typecheck & Vitest TDD Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install monorepo dependencies
+        run: npm ci
+
+      - name: Strict TypeScript Typecheck (@soil/shared & @soil/api)
+        run: npm run typecheck
+
+      - name: Execute Unit & Integration TDD Suite
+        run: npm test

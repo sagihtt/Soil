@@ -1,0 +1,66 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: soil-mysql
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-soil_root_2026}
+      MYSQL_DATABASE: ${DB_NAME:-soil}
+      MYSQL_USER: ${DB_USER:-soil_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-soil_pass_2026}
+    ports:
+      - "${DB_EXTERNAL_PORT:-3306}:3306"
+    volumes:
+      - soil_mysql_data:/var/lib/mysql
+      - ./infra/database/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./infra/database/seeds/002_seed_brazilian_fleet.sql:/docker-entrypoint-initdb.d/02-seed-brazilian.sql:ro
+      - ./infra/database/seeds/003_seed_tecdoc_national_fleet.sql:/docker-entrypoint-initdb.d/03-seed-tecdoc.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${DB_ROOT_PASSWORD:-soil_root_2026}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: soil-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: soil-api
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      USE_IN_MEMORY_DB: ${USE_IN_MEMORY_DB:-false}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-soil}
+      DB_USER: ${DB_USER:-soil_user}
+      DB_PASSWORD: ${DB_PASSWORD:-soil_pass_2026}
+      JWT_SECRET: ${JWT_SECRET:-soil-prod-jwt-secret-change-me-2026}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-Orcamentos SOIL <noreply@engine.lat>}
+    ports:
+      - "${PORT:-3000}:3000"
+
+volumes:
+  soil_mysql_data:
